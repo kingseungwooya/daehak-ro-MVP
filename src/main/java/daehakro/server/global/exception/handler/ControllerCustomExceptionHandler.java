@@ -12,14 +12,14 @@ public class ControllerCustomExceptionHandler {
 
     @ExceptionHandler(CustomValidationApiException.class)
     public HttpEntity<?> validationApiException(CustomValidationApiException e){
-        System.out.println("validationApiException");
         return new ResponseEntity<>(new ResponseDto<>(1, e.getMessage(),e.getErrorMap()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(CustomApiException.class)
     public HttpEntity<?> apiException(CustomApiException e){
-        System.out.println("apiException");
-        return new ResponseEntity<>(new ResponseDto<>(e.getResponseEnum()),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ResponseDto<>(e.getResponseEnum()), HttpStatus.valueOf(
+                e.getResponseEnum().getCode()
+        ));
     }
 
 }

@@ -26,6 +26,10 @@ public enum ResponseEnum {
     USER_USERNAME_CK_SUCCESS(200, "사용가능한 아이디입니다."),
     USER_USERNAME_CK_FAIL(500, "사융할 수 없는 아이디입니다."),
 
+    USER_KAKAO_INFO_EXIST(401, "이미 kakao login 완료된 사용자 입니다. "),
+    USER_MAIL_VERIFY_FAIL(401, "이메일 인증에 실패하였습니다."),
+    USER_FIRST_VERIFY_SUCCESS(200, "1차 검증에 성공하였습니다.(kakao)"),
+    USER_SECOND_VERIFY_SUCCESS(200, "2차 검증에 성공하였습니다. (user info)"),
     USER_JOIN_SUCCESS(200, "회원가입에 성공하였습니다."),
     USER_JOIN_FAIL(500, "다시 시도해주세요."),
 

@@ -8,6 +8,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +25,10 @@ public class UnivInfo {
     @Column(name = "univ_id")
     private Long univId;
 
-    private String domain;
+    @OneToOne(mappedBy = "univInfo")
+    private Member member;
+
+    private String mail;
 
     private String name;
 
@@ -32,9 +36,10 @@ public class UnivInfo {
     private Department department;
 
     @Builder
-    public UnivInfo(String domain, String name, Department department) {
-        this.domain = domain;
+    public UnivInfo(String mail, String name, Department department, Member member) {
+        this.mail = mail;
         this.name = name;
         this.department = department;
+        this.member = member;
     }
 }

@@ -1,6 +1,7 @@
 package daehakro.server.domain.member;
 
 import daehakro.server.domain.event.EventLog;
+import daehakro.server.domain.member.controller.dto.request.UserInfoDto;
 import daehakro.server.domain.member.enums.MemberSex;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,15 +32,25 @@ public class Member {
     @Column(name = "member_name")
     private String memberName;
 
+    @Column(name = " kakao_key")
+    private String kakaoKey;
+
+    @Column(name = "kakao_id")
+    private String kakaoId;
+
+
     @Enumerated(EnumType.STRING)
     private MemberSex sex;
 
     private int coin;
 
+    @Column(name = "info_flag", nullable = false, columnDefinition = "TINYINT", length = 1)
+    private boolean haveInfo;
+
     @Column(name = "certify_flag", nullable = false, columnDefinition = "TINYINT", length = 1)
     private boolean isCertify;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "univ_id")
     private UnivInfo univInfo;
 
@@ -48,19 +60,20 @@ public class Member {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member",cascade = CascadeType.PERSIST, orphanRemoval = true)
     List<ExcludedDepartment> excludedDepartments = new ArrayList<>();
 
-
-    @Builder
-    public Member(String memberId, String memberName, MemberSex sex,  UnivInfo univInfo) {
-        this.memberId = memberId;
-        this.memberName = memberName;
-        this.sex = sex;
-        this.coin = 1;
+    public Member(String uId, String kakaoKey) {
+        this.memberId = uId;
+        this.kakaoKey = kakaoKey;
+        this.haveInfo = false;
         this.isCertify = false;
-        this.univInfo = univInfo;
+        this.coin = 0;
     }
 
     public void applyEvent(EventLog eventLog) {
         this.eventLogs.add(eventLog);
+    }
+
+    public void useCoin(int pay) {
+        this.coin = coin - pay;
     }
 
     public void useCoin() {
@@ -74,8 +87,31 @@ public class Member {
         return false;
     }
 
+    public boolean haveCoin(int price) {
+        if (this.coin >= price) {
+            return true;
+        }
+        return false;
+    }
+
     public void addExcDepartment(ExcludedDepartment excludedDepartment) {
         this.excludedDepartments.add(excludedDepartment);
     }
 
+
+    public void updateInfo(UserInfoDto userInfoDto) {
+        this.sex = userInfoDto.getMemberSex();
+        this.memberName = userInfoDto.getNickName();
+        this.kakaoId = userInfoDto.getKakaoId();
+        this.haveInfo = true;
+    }
+
+    public void verify() {
+        this.isCertify = true;
+    }
+
+    // 학교 인증과 동시에
+    public void updateUnivInfo() {
+
+    }
 }
