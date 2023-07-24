@@ -1,10 +1,10 @@
 package daehakro.server.domain.member.mail;
 
 import java.time.LocalDateTime;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+
+import daehakro.server.domain.member.enums.Department;
+import daehakro.server.domain.member.mail.dto.request.EmailVerifyDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,15 +27,25 @@ public class EmailToken {
 
     private boolean expired;
 
+    private String email;
+
+    private String univName;
+
+    @Enumerated(EnumType.STRING)
+    private Department department;
+
     private String memberId;
 
 
     // 이메일 인증 토큰 생성
-    public static EmailToken createEmailToken(String memberId) {
+    public static EmailToken createEmailToken(EmailVerifyDto dto) {
         EmailToken emailToken = new EmailToken();
         emailToken.expirationDate = LocalDateTime.now().plusMinutes(EMAIL_TOKEN_EXPIRATION_TIME_VALUE); // 5분 후 만료
         emailToken.expired = false;
-        emailToken.memberId = memberId;
+        emailToken.memberId = dto.getUId();
+        emailToken.email = dto.getEmail();
+        emailToken.department = dto.getDepartment();
+        emailToken.univName = dto.getUnivName();
 
         return emailToken;
     }

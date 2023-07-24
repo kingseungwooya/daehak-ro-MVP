@@ -9,5 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UnivRepository extends JpaRepository<UnivInfo, Long> {
     List<UnivInfo> findAll();
+
+    boolean existsByMail(String mail);
 }
 

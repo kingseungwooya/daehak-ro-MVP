@@ -37,7 +37,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
     /**
-     * kakao login
+     * info 작성
      */
     @PostMapping("/user-info")
     public ResponseEntity<Void> userInfo(@RequestBody UserInfoDto userInfoDto) {

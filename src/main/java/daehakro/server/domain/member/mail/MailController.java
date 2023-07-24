@@ -1,39 +1,31 @@
 package daehakro.server.domain.member.mail;
 
-import daehakro.server.domain.member.controller.MemberController;
 import daehakro.server.domain.member.mail.dto.request.EmailAuthRequestDto;
 import daehakro.server.domain.member.mail.dto.request.EmailVerifyDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(MemberController.REST_URL_MEMBER)
+@RequestMapping(MailController.REST_URL_MAIL)
 public class MailController {
 
-    public static final String REST_URL_MEMBER = "api/mvp/mail";
+    public static final String REST_URL_MAIL = "api/mvp/mail";
 
     private final EmailService emailService;
 
     @PostMapping("/")
     public ResponseEntity sendMail(@RequestBody EmailVerifyDto emailVerifyDto) {
-
         emailService.sendMail(emailVerifyDto);
-
         return ResponseEntity.ok().build();
     }
 
     @ApiOperation(value = "이메일 인증", notes = "이메일 인증을 진행한다.")
     @GetMapping("/confirm-mail")
-    public ResponseEntity<?> confirmEmail(@ModelAttribute EmailAuthRequestDto requestDto) {
-        emailService.verifyEmail(requestDto);
-        return ResponseEntity.ok().build();
+    public String confirmEmail(@RequestParam(name = "code") String authToken) {
+        emailService.verifyEmail(authToken);
+        return "인증 성공하였습니다. 창을 닫을주세요";
     }
 }

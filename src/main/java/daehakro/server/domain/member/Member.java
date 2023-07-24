@@ -106,8 +106,9 @@ public class Member {
         this.haveInfo = true;
     }
 
-    public void verify() {
+    public void verify(UnivInfo univInfo) {
         this.isCertify = true;
+        this.univInfo = univInfo;
     }
 
     // 학교 인증과 동시에

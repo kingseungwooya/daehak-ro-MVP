@@ -9,11 +9,15 @@ import daehakro.server.domain.member.repo.MemberRepository;
 import daehakro.server.global.exception.ResponseEnum;
 import daehakro.server.global.exception.handler.CustomApiException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
+
+    private final static Logger logger = LoggerFactory.getLogger(MemberServiceImpl.class);
 
     private final MemberRepository memberRepository;
 
@@ -27,7 +31,9 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(userInfoDto.getUId()).orElseThrow(
                 () -> new CustomApiException(ResponseEnum.USER_NOT_FOUND)
         );
+        logger.info("user info input -> {}", userInfoDto.toString());
         member.updateInfo(userInfoDto);
+        memberRepository.save(member);
     }
 
     @Override
