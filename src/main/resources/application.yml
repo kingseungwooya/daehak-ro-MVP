@@ -18,7 +18,6 @@ spring:
           starttls:
             enable: true # 7
 
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -26,3 +25,8 @@ spring:
       hibernate:
         format_sql: true
         show-sql: true
+jwt:
+  secret: "김승우짱임  ㅋ ㅋ"
+  expiration-time: 864000000 # 하루 추후 변경
+  token-prefix: "test"
+  header-string: "Authorization"
