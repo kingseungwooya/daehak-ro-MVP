@@ -56,9 +56,6 @@ public class Event {
     @Column(name = "open_flag", nullable = false, columnDefinition = "TINYINT", length = 1)
     private boolean isOpen;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "univ_id")
-    private UnivInfo univInfo;
 
     // 하나의 event 당 신청자들의 정보를 갖고있는다.
     @OneToMany(fetch = FetchType.LAZY)
@@ -71,14 +68,13 @@ public class Event {
     private EventType eventType;
 
     @Builder
-    public Event(String eventName, LocalDate startDate, LocalDate endDate, int maxApply, UnivInfo univInfo, EventType eventType) {
+    public Event(String eventName, LocalDate startDate, LocalDate endDate, int maxApply,  EventType eventType) {
         this.eventName = eventName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.maxApply = maxApply;
         // 생성 즉시 open 할 것인가?
         this.isOpen = true;
-        this.univInfo = univInfo;
         this.eventType = eventType;
     }
 

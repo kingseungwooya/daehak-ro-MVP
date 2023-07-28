@@ -155,15 +155,14 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public void createEvent(EventDto eventDto) {
-        UnivInfo univInfo = univRepository.findById(eventDto.getUnivId()).orElseThrow(
-                () -> new CustomApiException(ResponseEnum.UNIV_NOT_EXIST)
-        );
+        // UnivInfo univInfo = univRepository.findById(eventDto.getUnivId()).orElseThrow(
+        //         () -> new CustomApiException(ResponseEnum.UNIV_NOT_EXIST)
+        // );
         Event event = Event.builder()
                 .eventName(eventDto.getEventName())
                 .maxApply(eventDto.getMaxApply())
                 .startDate(eventDto.getStartDate())
                 .endDate(eventDto.getEndDate())
-                .univInfo(univInfo)
                 .eventType(eventDto.getEventType())
                 .build();
         eventRepository.save(event);
