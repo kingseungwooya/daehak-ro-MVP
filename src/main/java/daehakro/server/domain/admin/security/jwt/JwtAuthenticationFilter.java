@@ -1,8 +1,14 @@
 package daehakro.server.domain.admin.security.jwt;
 
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.util.Date;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -82,8 +88,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withClaim("id", principalDetailis.getUser().getId())
                 .withClaim("username", principalDetailis.getUser().getUsername())
                 .sign(Algorithm.HMAC512(jwtConfig.getSecret()));
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("access_token", jwtToken);
 
         response.addHeader(jwtConfig.getHeaderString(), jwtConfig.getTokenPrefix() + jwtToken);
+        response.setContentType(APPLICATION_JSON_VALUE);
+        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }
 
 }
