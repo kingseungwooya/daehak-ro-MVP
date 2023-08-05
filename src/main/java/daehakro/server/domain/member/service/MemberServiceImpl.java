@@ -2,6 +2,7 @@ package daehakro.server.domain.member.service;
 
 import daehakro.server.domain.member.Member;
 import daehakro.server.domain.member.controller.dto.request.CheckMemberDto;
+import daehakro.server.domain.member.controller.dto.request.EditDto;
 import daehakro.server.domain.member.controller.dto.request.KakaoLoginDto;
 import daehakro.server.domain.member.controller.dto.request.UserInfoDto;
 import daehakro.server.domain.member.controller.dto.response.SignUpValidationDto;
@@ -24,6 +25,15 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean isAlreadyJoin(CheckMemberDto checkMemberDto) {
         return false;
+    }
+
+    @Override
+    public void editInfo(EditDto editDto) {
+        Member member = memberRepository.findById(editDto.getUId()).orElseThrow(
+                () -> new CustomApiException(ResponseEnum.USER_NOT_FOUND)
+        );
+        member.editInfo(editDto);
+        memberRepository.save(member);
     }
 
     @Override

@@ -31,8 +31,7 @@ public class EmailToken {
 
     private String univName;
 
-    @Enumerated(EnumType.STRING)
-    private Department department;
+    private String department;
 
     private String memberId;
 

@@ -1,5 +1,6 @@
 package daehakro.server.domain.event;
 
+import daehakro.server.domain.admin.controller.dto.response.EventResDto;
 import daehakro.server.domain.event.enums.EventType;
 import daehakro.server.domain.member.UnivInfo;
 import daehakro.server.domain.member.Member;
@@ -56,9 +57,8 @@ public class Event {
     @Column(name = "open_flag", nullable = false, columnDefinition = "TINYINT", length = 1)
     private boolean isOpen;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "univ_id")
-    private UnivInfo univInfo;
+    @Column(name = "match_flag", nullable = false, columnDefinition = "TINYINT", length = 1)
+    private boolean isMatch;
 
     // 하나의 event 당 신청자들의 정보를 갖고있는다.
     @OneToMany(fetch = FetchType.LAZY)
@@ -71,19 +71,23 @@ public class Event {
     private EventType eventType;
 
     @Builder
-    public Event(String eventName, LocalDate startDate, LocalDate endDate, int maxApply, UnivInfo univInfo, EventType eventType) {
+    public Event(String eventName, LocalDate startDate, LocalDate endDate, int maxApply,  EventType eventType) {
         this.eventName = eventName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.maxApply = maxApply;
         // 생성 즉시 open 할 것인가?
         this.isOpen = true;
-        this.univInfo = univInfo;
+        this.isMatch = false;
         this.eventType = eventType;
     }
 
     public void close() {
         this.isOpen = false;
+    }
+
+    public void match() {
+        this.isMatch = true;
     }
 
     public void apply(Member member) {
@@ -102,5 +106,24 @@ public class Event {
             return membersOfWomen.size() == maxApply;
         }
         return false;
+    }
+
+    public boolean isDateWithinRange() {
+        LocalDate currentDate = LocalDate.now();
+        return !currentDate.isBefore(startDate.minusDays(1)) && !currentDate.isAfter(endDate.plusDays(1));
+    }
+
+    public EventResDto to() {
+        return EventResDto.builder()
+                .eventId(eventId)
+                .eventName(eventName)
+                .eventType(eventType)
+                .endDate(endDate)
+                .startDate(startDate)
+                .manApply(membersOfMan.size())
+                .maxApply(maxApply)
+                .womanApply(membersOfWomen.size())
+                .match(isMatch)
+                .build();
     }
 }

@@ -33,8 +33,11 @@ public class EventLog {
 
     @Column(name = "close_flag", nullable = false, columnDefinition = "TINYINT", length = 1)
     private boolean isClose;
+
     @Column(name = "match_flag", nullable = false, columnDefinition = "TINYINT", length = 1)
     private boolean isMatch;
+
+    private Long coupleId;
 
     @Builder
     public EventLog(Long eventId, Member member) {
@@ -44,8 +47,10 @@ public class EventLog {
         this.isMatch = false;
     }
 
-    public void match() {
+    public void match(Long coupleId) {
         this.isMatch = true;
+        this.coupleId = coupleId;
+
     }
 
     public void close() {

@@ -25,7 +25,5 @@ public class EventDto {
 
     private EventType eventType;
 
-    private long univId;
-
 
 }

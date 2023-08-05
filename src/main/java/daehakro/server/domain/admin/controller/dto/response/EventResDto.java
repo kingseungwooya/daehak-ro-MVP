@@ -28,12 +28,12 @@ public class EventResDto {
 
     private final int maxApply;
 
-    private final boolean open;
+    private final boolean match;
 
     private final String eventType;
 
     @Builder
-    public EventResDto(Long eventId, String eventName, LocalDate startDate, LocalDate endDate, Timestamp createAt, int manApply, int womanApply, int maxApply, boolean open, EventType eventType) {
+    public EventResDto(Long eventId, String eventName, LocalDate startDate, LocalDate endDate, Timestamp createAt, int manApply, int womanApply, int maxApply, boolean match, EventType eventType) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.startDate = startDate;
@@ -42,7 +42,7 @@ public class EventResDto {
         this.manApply = manApply;
         this.womanApply = womanApply;
         this.maxApply = maxApply;
-        this.open = open;
+        this.match = match;
         this.eventType = eventType.name();
     }
 

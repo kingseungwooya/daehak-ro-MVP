@@ -1,4 +1,7 @@
 spring:
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
   datasource:
     url: jdbc:mysql://localhost:3306/daehak-ro?serverTimezone=UTC&characterEncoding=UTF-8
     username: root
@@ -18,7 +21,9 @@ spring:
           starttls:
             enable: true # 7
 
-
+  mvc: ##swagger연동을 위한 설정
+    pathmatch:
+      matching-strategy: ant_path_matcher
   jpa:
     hibernate:
       ddl-auto: update
@@ -26,3 +31,8 @@ spring:
       hibernate:
         format_sql: true
         show-sql: true
+jwt:
+  secret: "김승우짱임  ㅋ ㅋ"
+  expiration-time: 864000000 # 하루 추후 변경
+  token-prefix: "Bearer "
+  header-string: "Authorization"

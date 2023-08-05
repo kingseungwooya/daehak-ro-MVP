@@ -22,6 +22,7 @@ public enum ResponseEnum {
     EVENT_MATCH_FULL(403, "신청인원이 마감되었습니다."),
     EVENT_APPLICANTS_NUM_FAIL(403, "해당 EVENT의 참여 인원과 신청 인원이 불일치합니다."),
     EVENT_APPLICANT_FORM_FAIL(403, "동성끼리만 신청이 가능합니다."),
+    EVENT_ENDED(500, "이벤트 참여 기간이 아닙니다. "),
 
     USER_USERNAME_CK_SUCCESS(200, "사용가능한 아이디입니다."),
     USER_USERNAME_CK_FAIL(500, "사융할 수 없는 아이디입니다."),
@@ -32,7 +33,7 @@ public enum ResponseEnum {
     USER_FIRST_VERIFY_SUCCESS(200, "1차 검증에 성공하였습니다.(kakao)"),
     USER_SECOND_VERIFY_SUCCESS(200, "2차 검증에 성공하였습니다. (user info)"),
     USER_JOIN_SUCCESS(200, "회원가입에 성공하였습니다."),
-    USER_JOIN_FAIL(500, "다시 시도해주세요."),
+    USER_JOIN_FAIL(400, "다시 시도해주세요."),
 
     USER_MY_INFO_SUCCESS(200,"조회 성공"),
     USER_NOT_FOUND(401,"회원이 존재하지 않습니다"),

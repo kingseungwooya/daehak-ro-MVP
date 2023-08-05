@@ -2,6 +2,7 @@ package daehakro.server.domain.member.mail;
 
 import daehakro.server.domain.member.Member;
 import daehakro.server.domain.member.UnivInfo;
+import daehakro.server.domain.member.enums.Department;
 import daehakro.server.domain.member.mail.dto.request.EmailAuthRequestDto;
 import daehakro.server.domain.member.mail.dto.request.EmailVerifyDto;
 import daehakro.server.domain.member.mail.util.MailUtils;
@@ -107,7 +108,7 @@ public class EmailService {
                         .member(member)
                         .mail(findEmailToken.getEmail())
                         .name(findEmailToken.getUnivName())
-                        .department(findEmailToken.getDepartment())
+                        .department(Department.of(findEmailToken.getDepartment()))
                         .build()
         );
         member.verify(univInfo);

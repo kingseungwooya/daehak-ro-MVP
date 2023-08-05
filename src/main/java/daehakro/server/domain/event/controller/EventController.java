@@ -43,8 +43,13 @@ public class EventController {
     }
 
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<EventResDto>> eventInfo() {
         return new ResponseEntity<>(eventService.getAllEvents(), HttpStatus.OK);
+    }
+
+    @GetMapping("/couple")
+    public ResponseEntity<?> couple() {
+        return null;
     }
 }

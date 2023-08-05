@@ -63,7 +63,9 @@ public class EventServiceImpl implements EventService {
         Member member = memberRepository.findById(applyForm.getMemberId()).orElseThrow(
                 () -> new CustomApiException(ResponseEnum.USER_NOT_FOUND)
         );
-        // 멤버가 이미 참여하고 있는 이벤트이거나, 아직 종료되지 않은 이벤트를 신청중일 시 error
+        if (event.isDateWithinRange()) {
+            throw new CustomApiException(ResponseEnum.EVENT_ENDED);
+        }
         if (isDuplicateApply(member, event.getEventId())) {
             throw new CustomApiException(ResponseEnum.EVENT_APPLICANT_ALREADY_EXIST);
         }
@@ -94,6 +96,7 @@ public class EventServiceImpl implements EventService {
         }
         // event 추가 알아서 save 일어남
         event.apply(member);
+        eventRepository.save(event);
     }
 
     private boolean isDuplicateApply(Member member, Long eventId) {
@@ -115,6 +118,9 @@ public class EventServiceImpl implements EventService {
         // event 신청 인원과 같은지 검증
         if (event.getEventType().getLimitOfEachSex() != applyForm.getMemberIds().size()) {
             throw new CustomApiException(ResponseEnum.EVENT_APPLICANTS_NUM_FAIL);
+        }
+        if (event.isDateWithinRange()) {
+            throw new CustomApiException(ResponseEnum.EVENT_ENDED);
         }
 
         List<Member> members = applyForm.getMemberIds().stream().
@@ -190,11 +196,12 @@ public class EventServiceImpl implements EventService {
                 .map(e ->
                         EventResDto.builder()
                                 .eventId(e.getEventId())
+                                .eventName(e.getEventName())
                                 .maxApply(e.getMaxApply())
                                 .startDate(e.getStartDate())
                                 .endDate(e.getEndDate())
                                 .createAt(e.getCreateAt())
-                                .open(e.isOpen())
+                                .match(e.isMatch())
                                 .manApply(e.getMembersOfMan().size())
                                 .womanApply(e.getMembersOfWomen().size())
                                 .eventType(e.getEventType())

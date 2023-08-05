@@ -1,6 +1,7 @@
 package daehakro.server.domain.member;
 
 import daehakro.server.domain.event.EventLog;
+import daehakro.server.domain.member.controller.dto.request.EditDto;
 import daehakro.server.domain.member.controller.dto.request.UserInfoDto;
 import daehakro.server.domain.member.enums.MemberSex;
 import java.util.ArrayList;
@@ -13,10 +14,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -104,6 +103,12 @@ public class Member {
         this.memberName = userInfoDto.getNickName();
         this.kakaoId = userInfoDto.getKakaoId();
         this.haveInfo = true;
+    }
+
+    public void editInfo(EditDto editDto) {
+        this.sex = editDto.getMemberSex();
+        this.memberName = editDto.getNickName();
+        this.kakaoId = editDto.getKakaoId();
     }
 
     public void verify(UnivInfo univInfo) {

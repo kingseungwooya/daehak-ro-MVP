@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 public class EmailVerifyDto {
     private String uId;
     private String univName;
-    private Department department;
+    private String department;
     private String email;
 }
