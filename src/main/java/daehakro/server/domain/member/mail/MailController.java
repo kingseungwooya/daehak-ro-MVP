@@ -16,7 +16,7 @@ public class MailController {
 
     private final EmailService emailService;
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity sendMail(@RequestBody EmailVerifyDto emailVerifyDto) {
         emailService.sendMail(emailVerifyDto);
         return ResponseEntity.ok().build();
