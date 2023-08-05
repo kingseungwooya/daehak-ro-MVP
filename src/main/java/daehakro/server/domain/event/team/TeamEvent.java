@@ -1,5 +1,6 @@
 package daehakro.server.domain.event.team;
 
+import daehakro.server.domain.admin.controller.dto.response.EventResDto;
 import daehakro.server.domain.event.enums.EventType;
 import daehakro.server.domain.member.enums.MemberSex;
 import daehakro.server.domain.member.team.Team;
@@ -64,6 +65,9 @@ public class TeamEvent {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "event", cascade = CascadeType.ALL)
     private List<Team> womenTeams = new ArrayList<>();
 
+    @Column(name = "match_flag", nullable = false, columnDefinition = "TINYINT", length = 1)
+    private boolean isMatch;
+
     @Builder
     public TeamEvent(String eventName, LocalDate startDate, LocalDate endDate, int maxApply, EventType eventType) {
         this.eventName = eventName;
@@ -72,7 +76,11 @@ public class TeamEvent {
         this.maxApply = maxApply;
         // 생성 즉시 open 할 것인가?
         this.isOpen = true;
+        this.isMatch = false;
         this.eventType = eventType;
+    }
+    public void match() {
+        this.isMatch = true;
     }
 
     public void close() {
@@ -87,6 +95,11 @@ public class TeamEvent {
         }
     }
 
+    public boolean isDateWithinRange() {
+        LocalDate currentDate = LocalDate.now();
+        return !currentDate.isBefore(startDate.minusDays(1)) && !currentDate.isAfter(endDate.plusDays(1));
+    }
+
     public boolean isFull(MemberSex sex) {
         if (sex.equals(MemberSex.MAN)) {
             return manTeams.size() == maxApply;
@@ -95,5 +108,19 @@ public class TeamEvent {
             return womenTeams.size() == maxApply;
         }
         return false;
+    }
+
+    public EventResDto to() {
+        return EventResDto.builder()
+                .eventId(eventId)
+                .eventName(eventName)
+                .eventType(eventType)
+                .endDate(endDate)
+                .startDate(startDate)
+                .manApply(manTeams.size())
+                .maxApply(maxApply)
+                .womanApply(womenTeams.size())
+                .match(isMatch)
+                .build();
     }
 }
