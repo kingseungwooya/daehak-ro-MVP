@@ -3,6 +3,7 @@ package daehakro.server.domain.event.service;
 import daehakro.server.domain.admin.controller.dto.response.EventResDto;
 import daehakro.server.domain.event.controller.dto.request.MemberApplyForm;
 import daehakro.server.domain.event.controller.dto.request.TeamApplyForm;
+import daehakro.server.domain.event.controller.dto.response.MemberEventDto;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -15,4 +16,8 @@ public interface EventService {
     void applyTeamEvent(TeamApplyForm applyForm);
 
     List<EventResDto> getAllEvents();
+
+    List<MemberEventDto> getMyEvents(String uid);
+
+    List<EventResDto> getOpenedEvents();
 }

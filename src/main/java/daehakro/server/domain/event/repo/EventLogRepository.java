@@ -14,4 +14,6 @@ public interface EventLogRepository extends JpaRepository<EventLog, Long> {
     EventLog findByMemberAndEventId(Member member, Long eventId);
 
     List<EventLog> findByEventId(Long eventId);
+
+    List<EventLog> findByMember(Member member);
 }

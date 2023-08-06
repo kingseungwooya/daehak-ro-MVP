@@ -44,7 +44,6 @@ public class AdminServiceImpl implements AdminService {
     private final EventRepository eventRepository;
     private final TeamEventRepository teamEventRepository;
     private final EventLogRepository eventLogRepository;
-    private final TeamRepository teamRepository;
     private final ExcludedDepartmentRepository excludedDepartmentRepository;
     private final CoupleRepository coupleRepository;
 
@@ -143,7 +142,7 @@ public class AdminServiceImpl implements AdminService {
                 () -> new CustomApiException(ResponseEnum.EVENT_NOT_EXIST)
         );
         event.close();
-        // eventLog도 모두 isClose로 바꿔줄것
+        // eventLog도 모두 isClose로 바꿔줄것 삭제는 하지 않는다.
         List<EventLog> logs = eventLogRepository.findByEventId(eventId);
         logs.stream().forEach(EventLog::close);
         // 이벤트마다 ban 할 department를 정하기에 이것도 모두 제거
@@ -198,18 +197,6 @@ public class AdminServiceImpl implements AdminService {
                 .eventName(event.getEventName())
                 .build();
     }
-
-    // @Override
-    // public void closeTeamEvent(Long eventId) {
-    //     TeamEvent event = teamEventRepository.findById(eventId).orElseThrow(
-    //             () -> new CustomApiException(ResponseEnum.EVENT_NOT_EXIST)
-    //     );
-    //     event.close();
-    //     // eventLog도 모두 isClose로 바꿔줄것
-    //     List<EventLog> logs = eventLogRepository.findByEventId(eventId);
-    //     logs.stream().forEach(EventLog::close);
-    //     teamRepository.deleteAllByEvent(event);
-    // }
 
 
     /**

@@ -5,6 +5,8 @@ import daehakro.server.domain.event.Event;
 import daehakro.server.domain.event.EventLog;
 import daehakro.server.domain.event.controller.dto.request.MemberApplyForm;
 import daehakro.server.domain.event.controller.dto.request.TeamApplyForm;
+import daehakro.server.domain.event.controller.dto.response.MemberEventDto;
+import daehakro.server.domain.event.enums.EventType;
 import daehakro.server.domain.event.repo.EventLogRepository;
 import daehakro.server.domain.event.repo.EventRepository;
 import daehakro.server.domain.event.repo.TeamEventRepository;
@@ -19,8 +21,11 @@ import daehakro.server.domain.member.repo.TeamRepository;
 import daehakro.server.domain.member.team.Team;
 import daehakro.server.global.exception.ResponseEnum;
 import daehakro.server.global.exception.handler.CustomApiException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,26 +40,9 @@ public class EventServiceImpl implements EventService {
     private final EventLogRepository eventLogRepository;
     private final ExcludedDepartmentRepository excludedDepartmentRepository;
 
-    /**
-     * 검증필요
-     * 인증된 사용자인가?
-     * 쿠폰을 사용하였는가?
-     * 결제를 하였는가?
-     * 신청기간이 지났는가?
-     */
-
-    /**
-     * event 신청 절차
-     * 존재하는 event인가
-     * 존재하는 사용자인가
-     * 신청을 위한 최소한의 코인을 가지고 있는가?
-     * 중복되는 이벤트를 신청한 경우가 있는가?
-     * 이벤트 참여인원 제한이 걸렸는가
-     *
-     * @param applyForm
-     */
 
     @Override
+    @Transactional
     public void applyEvent(MemberApplyForm applyForm) {
         Event event = eventRepository.findById(applyForm.getEventId()).orElseThrow(
                 () -> new CustomApiException(ResponseEnum.EVENT_NOT_EXIST)
@@ -80,6 +68,7 @@ public class EventServiceImpl implements EventService {
         EventLog eventLog = EventLog.builder()
                 .member(member)
                 .eventId(event.getEventId())
+                .eventType(event.getEventType())
                 .build();
         eventLogRepository.save(eventLog);
         // member 필드에 eventLog 저장
@@ -101,8 +90,8 @@ public class EventServiceImpl implements EventService {
 
     private boolean isDuplicateApply(Member member, Long eventId) {
         if (
-                eventLogRepository.existsByEventIdAndMember(eventId, member) ||
-                        eventLogRepository.existsByMemberAndIsClose(member, false)
+                eventLogRepository.existsByEventIdAndMember(eventId, member) || // 해당  event를  참여하고 있는지
+                        eventLogRepository.existsByMemberAndIsClose(member, false) // 참여하고 있는게 있을시.. 참여 불가능
         ) {
             return true;
         }
@@ -110,6 +99,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public void applyTeamEvent(TeamApplyForm applyForm) {
         TeamEvent event = teamEventRepository.findById(applyForm.getEventId()).orElseThrow(
                 () -> new CustomApiException(ResponseEnum.EVENT_NOT_EXIST)
@@ -158,12 +148,12 @@ public class EventServiceImpl implements EventService {
             EventLog eventLog = EventLog.builder()
                     .member(member)
                     .eventId(event.getEventId())
+                    .eventType(event.getEventType())
                     .build();
             eventLogRepository.save(eventLog);
             member.applyEvent(eventLog);
         }
         // excluded 설정 대표만 설정한다. 굳이 나머지 팀원들도 할 필요는 없다.
-
 
         Team team = Team.builder()
                 .teamSex(memberSexes.get(0))
@@ -186,28 +176,84 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * 생성되었던 event들을 가져온다. 생성 순으로
+     * 생성되었던 event들을 가져온다. 생성 순으로 -> type별로도
      */
     @Override
     public List<EventResDto> getAllEvents() {
+        List<TeamEvent> teamEvents = teamEventRepository.findAllByOrderByCreateAtDesc();
         List<Event> events = eventRepository.findAllByOrderByCreateAtDesc();
-
-        return events.stream()
-                .map(e ->
-                        EventResDto.builder()
-                                .eventId(e.getEventId())
-                                .eventName(e.getEventName())
-                                .maxApply(e.getMaxApply())
-                                .startDate(e.getStartDate())
-                                .endDate(e.getEndDate())
-                                .createAt(e.getCreateAt())
-                                .match(e.isMatch())
-                                .manApply(e.getMembersOfMan().size())
-                                .womanApply(e.getMembersOfWomen().size())
-                                .eventType(e.getEventType())
-                                .build())
-                .collect(Collectors.toList());
+        List<EventResDto> responses = new ArrayList<>();
+        responses.addAll(teamEvents.stream()
+                .map(
+                        t -> new EventResDto(t)
+                )
+                .collect(Collectors.toList())
+        );
+        responses.addAll(events.stream()
+                .map(
+                        e -> new EventResDto(e)
+                )
+                .collect(Collectors.toList())
+        );
+        return responses;
     }
+
+    /**
+     * 내가 참여한 이벤트 목록들 가져오기
+     */
+    @Override
+    public List<MemberEventDto> getMyEvents(String uid) {
+        Member member = memberRepository.findById(uid).orElseThrow(
+                () -> new CustomApiException(ResponseEnum.USER_NOT_FOUND)
+        );
+        List<MemberEventDto> memberEventDtos = new ArrayList<>();
+
+        List<EventLog> myEvents = eventLogRepository.findByMember(member);
+        for (EventLog eventLog : myEvents) {
+            if (eventLog.getEventType().equals(EventType.ONE_ONE)) {
+                Event event = eventRepository.findById(eventLog.getEventId()).get();
+                MemberEventDto memberEventDto = new MemberEventDto(event);
+                memberEventDtos.add(memberEventDto);
+                continue;
+            }
+            TeamEvent event = teamEventRepository.findById(eventLog.getEventId()).get();
+            MemberEventDto memberEventDto = new MemberEventDto(event);
+            memberEventDtos.add(memberEventDto);
+        }
+        return memberEventDtos;
+    }
+
+    /**
+     * endDate가 끝나지 않은 event들 반환 -> user쪾에서 받을 정보
+     * @return
+     */
+    @Override
+    public List<EventResDto> getOpenedEvents() {
+        LocalDate today = LocalDate.now();
+        List<TeamEvent> teamEvents = teamEventRepository.findAllByEndDateGreaterThanEqualOrderByStartDate(today);
+        List<Event> events = eventRepository.findAllByEndDateGreaterThanEqualOrderByStartDate(today);
+        List<EventResDto> responses = new ArrayList<>();
+        responses.addAll(teamEvents.stream()
+                .map(
+                        t -> new EventResDto(t)
+                )
+                .collect(Collectors.toList())
+        );
+        responses.addAll(events.stream()
+                .map(
+                        e -> new EventResDto(e)
+                )
+                .collect(Collectors.toList())
+        );
+
+        return responses;
+    }
+
+
+    /**
+     * User 화면에서 이벤트들 불러오기
+     * 현재 참여 가능한 event만
+     */
 
 
     public boolean isAllEnumsEqual(List<MemberSex> enumList) {
