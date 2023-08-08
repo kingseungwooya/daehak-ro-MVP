@@ -5,12 +5,14 @@ import static daehakro.server.domain.event.controller.EventController.REST_URL_E
 import daehakro.server.domain.admin.controller.dto.response.EventResDto;
 import daehakro.server.domain.event.controller.dto.request.MemberApplyForm;
 import daehakro.server.domain.event.controller.dto.request.TeamApplyForm;
+import daehakro.server.domain.event.controller.dto.response.MemberEventDto;
 import daehakro.server.domain.event.service.EventService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.
         web.bind.annotation.RequestBody;
@@ -44,8 +46,22 @@ public class EventController {
 
 
     @GetMapping("")
-    public ResponseEntity<List<EventResDto>> eventInfo() {
+    public ResponseEntity<List<EventResDto>> events() {
         return new ResponseEntity<>(eventService.getAllEvents(), HttpStatus.OK);
+    }
+
+    /**
+     * 내 참여 현황
+     * @return
+     */
+    @GetMapping("/my/{uid}")
+    public ResponseEntity<List<MemberEventDto>> myEvent(@PathVariable String uid) {
+        return new ResponseEntity<>(eventService.getMyEvents(uid), HttpStatus.OK);
+    }
+
+    @GetMapping("/open")
+    public ResponseEntity<List<EventResDto>> openedEvents() {
+        return new ResponseEntity<>(eventService.getOpenedEvents(), HttpStatus.OK);
     }
 
     @GetMapping("/couple")
