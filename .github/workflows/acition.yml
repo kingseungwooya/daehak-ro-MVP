@@ -66,8 +66,8 @@ jobs:
           script: |
               sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
               sudo docker rm -f $(docker ps -qa)
-              sudo docker pull ${{ secrets.DOCKER_REPO }}/daehakro:latest 
+              sudo docker pull ${{ secrets.DOCKER_REPO }}:latest 
               sudo docker rm -f ${{ secrets.DOCKER_CONTAINER_NAME }}-container
-              docker create --name ${{ secrets.DOCKER_CONTAINER_NAME }}-container -p 443:443 -e TZ=Asia/Seoul ${{ secrets.DOCKER_REPO }}/daehakro:latest
+              docker create --name ${{ secrets.DOCKER_CONTAINER_NAME }}-container -p 443:443 -e TZ=Asia/Seoul ${{ secrets.DOCKER_REPO }}:latest
               docker start ${{ secrets.DOCKER_CONTAINER_NAME }}-container
               docker image prune -f      
