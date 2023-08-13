@@ -37,7 +37,7 @@ public class MemberController {
     /**
      * kakao login
      */
-    @PostMapping("/kakao-login")
+    @PostMapping("/kakao-register")
     public ResponseEntity<Void> kakaoLogin(@RequestBody KakaoLoginDto kakaoLoginDto) {
         memberService.kakaoLogin(kakaoLoginDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
