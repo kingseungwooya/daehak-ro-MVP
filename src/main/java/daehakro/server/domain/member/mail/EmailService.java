@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
@@ -44,8 +45,8 @@ public class EmailService {
     private final UnivRepository univRepository;
 
 
-    // 추후 배포되면 secret으로 바꿔야함
-    private String api = "http://localhost:8080/api/mvp/mail/confirm-mail?code=";
+    @Value("${mail.redirect.page}")
+    private String api;
 
     // type = email
     @Transactional
@@ -101,7 +102,6 @@ public class EmailService {
                 .orElseThrow(
                         () -> new CustomApiException(ResponseEnum.USER_NOT_FOUND)
                 );
-        // univRepository.f
         // mail 정보로 member univ info 저장
         UnivInfo univInfo = univRepository.save(
                 UnivInfo.builder()
